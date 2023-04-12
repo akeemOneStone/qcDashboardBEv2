@@ -6,6 +6,7 @@ import BarGraph
 import HeatMap
 import LineGraph
 import PieChart
+
 print("\nClient Service\n")
 
 
@@ -20,17 +21,34 @@ def getClientsCode():
     numClients = len(clientsCodeAR)
     return clientsCodeAR, numClients
 
-def getNextClient(allClients):
-    currentClient = ""
+
+
+def getNextClient(allClients, numClients):
+    
+
+    currentClientJson = json.load(open('current-client.json'))
+    currentClient = currentClientJson['current-client']
+    print(currentClient)
 
     if len(currentClient) == 0:
         currentClient = allClients[0]
     print(currentClient)
 
     currentClientIndex = allClients.index(currentClient)
-    
-    nextClientIndex = currentClientIndex + 1
+
+    nextClientIndex = (int(int(currentClientIndex) + 1)%int(numClients))
+
+    # nextClientIndex = currentClientIndex + 1
+
+    print("mod: "+str(nextClientIndex))
+
     newCurrentClient = allClients[nextClientIndex]
+
+    updatedClient = {"current-client":newCurrentClient}
+
+    with open('current-client.json', 'w') as f:
+        json.dump(updatedClient, f)
+
     return newCurrentClient
 
 def sendToDataGenerators(nextClient):
@@ -40,7 +58,7 @@ def sendToDataGenerators(nextClient):
     pieChartData = PieChart.generateData(nextClient)
     lineGraphData = LineGraph.generateData(nextClient)
 
-    compiledData = [barGraphData,heatMapData,pieChartData,lineGraphData]
+    compiledData = [nextClient, barGraphData,heatMapData,pieChartData,lineGraphData]
     return compiledData
 
 def dataCollector(compiledData):
@@ -49,8 +67,8 @@ def dataCollector(compiledData):
 def main():
     clientsList, numClients = getClientsCode()
     print(clientsList)
-    returnedData = sendToDataGenerators(getNextClient(clientsList))
-    print(returnedData)
+    returnedData = sendToDataGenerators(getNextClient(clientsList, numClients))
+    compiledData = dataCollector
     return returnedData
 
 if __name__ == "__main__":
