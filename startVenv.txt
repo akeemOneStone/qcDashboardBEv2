@@ -1,0 +1,8 @@
+Command to start Venv
+> py -3 -m venv venv
+
+Command to activate Venv
+> venv\Scripts\activate
+
+Start Flask App
+> flask --app {flaskApp Name} --debug run
